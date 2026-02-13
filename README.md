@@ -114,7 +114,7 @@ Tests include:
 
 ## 📌 API Routes
 
-The insomnia api collection file is available on the project.  
+The insomnia api collection file is available on th/home/kosaki/Documents/Insomnia_2026-02-13.yaml project.  
 
 ### 1. Withdraw
 
