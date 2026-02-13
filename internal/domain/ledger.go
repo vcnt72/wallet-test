@@ -22,7 +22,7 @@ var (
 )
 
 var (
-	ErrLedgerConflict       = errors.New("unique constraint error on ledger")
+	ErrLedgerConflict       = errors.New("error ledger unique constraint")
 	ErrLedgerNotFound       = errors.New("error ledger not found")
 	ErrIdempotencyKeyReused = errors.New("error idempotency key reused")
 	ErrWithdrawFailed       = errors.New("error withdraw failed")

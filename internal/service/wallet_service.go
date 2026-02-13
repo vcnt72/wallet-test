@@ -79,9 +79,13 @@ func (w WalletService) Withdraw(ctx context.Context, spec WithdrawWalletSpec) (*
 	})
 
 	if errors.Is(err, domain.ErrLedgerConflict) {
-		withdrawResult, err := w.handleConflictWithdraw(ctx, spec)
+		withdrawResult, err2 := w.handleConflictWithdraw(ctx, spec)
 
-		return withdrawResult, err
+		if err2 != nil {
+			return nil, errors.Join(err, err2)
+		}
+
+		return withdrawResult, nil
 	}
 
 	if err != nil {

@@ -32,7 +32,7 @@ Before running the project, ensure you have:
 
 - Go 1.22+
 - PostgreSQL 14+
-- Git
+- Goose
 
 ---
 
@@ -46,17 +46,37 @@ go mod tidy
 
 ### 2. Create PostgreSQL database
 
+If you don't have postgres in your local machine you can:
+
+```bash
+docker run --name postgres -e POSTGRES_PASSWORD=12345678 -p 5432:5432 -d postgres    
+```
+
+Then run this on sql:
+
 ```sql
 CREATE DATABASE digital_wallet;
 ```
 
 ### 3. Copy env
 
+Run this script:
+
 ```bash
 cp .env.example .env
 ```
 
+and change the db username and password on DB_URL
+
 ### 4. Run database migrations
+
+If you don't have goose in your local machine you can install it by:
+
+```bash
+go install github.com/pressly/goose/v3/cmd/goose@latest
+```
+
+Then run this on the project
 
 ```bash
 goose up
@@ -101,9 +121,30 @@ Tests include:
 POST /v1/wallets/withdraw
 ```
 
+#### Idempotency Replay
+
+The Withdraw API uses a unique idempotency_key to prevent double deduction.
+If the same key is sent again, the system does not execute the withdrawal twice.
+Instead, it returns the previously stored result.
+
+#### CURL
+
+```curl
+curl --request POST \
+  --url http://localhost:8000/v1/wallets/withdraw \
+  --header 'Content-Type: application/json' \
+  --header 'User-Agent: insomnia/12.3.0' \
+  --header 'X-Idempotency-Key: test-5' \
+  --header 'X-User-ID: 1' \
+  --data '{
+ "amount": 20000
+}'
+
+```
+
 #### Headers
 
-- Idempotency-Key: it should be any random string. it's client generated
+- Idempotency-Key: it's client generated and ideally it would be uuid but it can be anything.
 - X-User-ID: 1
 
 #### Request Body
@@ -142,6 +183,15 @@ POST /v1/wallets/withdraw
 POST /v1/wallets/balance
 ```
 
+#### CURL
+
+```curl
+curl --request GET \
+  --url http://localhost:8000/v1/wallets/balance \
+  --header 'User-Agent: insomnia/12.3.0' \
+  --header 'X-User-ID: 1'
+```
+
 #### Headers
 
 - X-User-ID: 1
@@ -158,6 +208,19 @@ POST /v1/wallets/balance
 
 ```http
 POST /v1/users
+```
+
+#### CURL
+
+```curl
+curl --request POST \
+  --url http://localhost:8000/v1/users \
+  --header 'Content-Type: application/json' \
+  --header 'User-Agent: insomnia/12.3.0' \
+  --data '{
+ "name": "Bolang",
+ "balance": 200000
+}'
 ```
 
 #### Request Body

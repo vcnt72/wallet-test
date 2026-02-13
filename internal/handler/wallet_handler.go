@@ -8,7 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vcnt72/go-boilerplate/internal/domain"
 	"github.com/vcnt72/go-boilerplate/internal/service"
+	"github.com/vcnt72/go-boilerplate/internal/utils/logger"
 	"github.com/vcnt72/go-boilerplate/internal/utils/response"
+	"go.uber.org/zap"
 )
 
 type WalletHandler struct {
@@ -32,6 +34,8 @@ func (w WalletHandler) GetBalance() gin.HandlerFunc {
 				ctx.JSON(http.StatusNotFound, response.Error(ctx, "DATA_NOT_FOUND", "User not found"))
 				return
 			}
+
+			logger.Log.Error("error on get user balance", zap.Error(err))
 
 			ctx.JSON(http.StatusInternalServerError, response.Error(ctx, "UNKNOWN_ERROR", "Unknown error"))
 			return
@@ -81,42 +85,8 @@ func (w WalletHandler) Withdraw() gin.HandlerFunc {
 			Amount:         req.Amount,
 		})
 		if err != nil {
-			switch {
-			case errors.Is(err, domain.ErrInvalidAmount):
-				ctx.JSON(http.StatusBadRequest,
-					response.Error(ctx, "INVALID_AMOUNT", "amount must be greater than 0"))
-				return
-
-			case errors.Is(err, domain.ErrWalletNotFound):
-				ctx.JSON(http.StatusNotFound,
-					response.Error(ctx, "WALLET_NOT_FOUND", "wallet not found"))
-				return
-
-			case errors.Is(err, domain.ErrInsufficientFund):
-				ctx.JSON(http.StatusConflict,
-					response.Error(ctx, "INSUFFICIENT_FUNDS", "insufficient balance"))
-				return
-
-			case errors.Is(err, domain.ErrIdempotencyKeyReused):
-				ctx.JSON(http.StatusConflict,
-					response.Error(ctx, "IDEMPOTENCY_KEY_REUSED", "idempotency key reused with different request"))
-				return
-
-			case errors.Is(err, domain.ErrRequestInProgress):
-				ctx.JSON(http.StatusConflict,
-					response.Error(ctx, "REQUEST_IN_PROGRESS", "request is being processed, please retry"))
-				return
-
-			case errors.Is(err, domain.ErrWithdrawFailed):
-				ctx.JSON(http.StatusInternalServerError,
-					response.Error(ctx, "WITHDRAW_FAILED", "withdraw failed"))
-				return
-
-			default:
-				ctx.JSON(http.StatusInternalServerError,
-					response.Error(ctx, "UNKNOWN_ERROR", "internal server error"))
-				return
-			}
+			w.withdrawReturnError(ctx, err)
+			return
 		}
 
 		ctx.JSON(http.StatusOK, response.Success(ctx, response.JSON{
@@ -124,6 +94,48 @@ func (w WalletHandler) Withdraw() gin.HandlerFunc {
 			"amount":  withdrawalRes.Amount,
 			"userId":  withdrawalRes.UserID,
 		}))
+	}
+}
+
+func (w WalletHandler) withdrawReturnError(ctx *gin.Context, err error) {
+	logger.Log.Error("error on withdraw balance", zap.Error(err))
+	switch {
+	case errors.Is(err, domain.ErrInvalidAmount):
+		ctx.JSON(http.StatusBadRequest,
+			response.Error(ctx, "INVALID_AMOUNT", "amount must be greater than 0"))
+		return
+
+	case errors.Is(err, domain.ErrWalletNotFound):
+		ctx.JSON(http.StatusNotFound,
+			response.Error(ctx, "WALLET_NOT_FOUND", "wallet not found"))
+		return
+
+	case errors.Is(err, domain.ErrInsufficientFund):
+		ctx.JSON(http.StatusConflict,
+			response.Error(ctx, "INSUFFICIENT_FUNDS", "insufficient balance"))
+		return
+
+	case errors.Is(err, domain.ErrIdempotencyKeyReused):
+		ctx.JSON(http.StatusConflict,
+			response.Error(ctx, "IDEMPOTENCY_KEY_REUSED", "idempotency key reused with different request"))
+		return
+
+	case errors.Is(err, domain.ErrRequestInProgress):
+		ctx.JSON(http.StatusConflict,
+			response.Error(ctx, "REQUEST_IN_PROGRESS", "request is being processed, please retry"))
+		return
+
+	case errors.Is(err, domain.ErrWithdrawFailed):
+		logger.Log.Error("error on withdraw balance", zap.Error(err))
+		ctx.JSON(http.StatusInternalServerError,
+			response.Error(ctx, "WITHDRAW_FAILED", "withdraw failed"))
+		return
+
+	default:
+		logger.Log.Error("error on withdraw balance", zap.Error(err))
+		ctx.JSON(http.StatusInternalServerError,
+			response.Error(ctx, "UNKNOWN_ERROR", "internal server error"))
+		return
 	}
 }
 

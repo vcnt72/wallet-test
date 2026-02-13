@@ -11,10 +11,12 @@ import (
 	"github.com/vcnt72/go-boilerplate/internal/repository"
 	"github.com/vcnt72/go-boilerplate/internal/router"
 	"github.com/vcnt72/go-boilerplate/internal/service"
+	"github.com/vcnt72/go-boilerplate/internal/utils/logger"
 )
 
 func main() {
 	config.Load()
+	logger.Load()
 	db := database.NewPostgres()
 	routerEngine := gin.Default()
 
