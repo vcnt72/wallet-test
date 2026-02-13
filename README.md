@@ -114,6 +114,8 @@ Tests include:
 
 ## 📌 API Routes
 
+The insomnia api collection file is available on the project.  
+
 ### 1. Withdraw
 
 ```http

@@ -1,0 +1,122 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: Mampu IO Test
+meta:
+  id: wrk_838210920a204d18ad841dfbb17286d2
+  created: 1770800907677
+  modified: 1770800907677
+  description: ""
+collection:
+  - url: "{{BASE_PATH}}/v1/users"
+    name: Create User
+    meta:
+      id: req_50ed4d21fb854900938634fe90fb040a
+      created: 1770800913546
+      modified: 1770953982764
+      isPrivate: false
+      description: ""
+      sortKey: -1770800913547
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"name": "Bolang",
+        	"balance": 200000
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/12.3.0
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: "{{BASE_PATH}}/v1/wallets/balance"
+    name: Get Balance
+    meta:
+      id: req_5a3929616d214ae680cf3567bb2478c6
+      created: 1770802704243
+      modified: 1770883973478
+      isPrivate: false
+      description: ""
+      sortKey: -1770013032389.5
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/12.3.0
+        description: ""
+        disabled: false
+      - name: X-User-ID
+        value: "1"
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: "{{BASE_PATH}}/v1/wallets/withdraw"
+    name: Withdraw Balance
+    meta:
+      id: req_9eaf18e6bfe14a4ba60fe66eef51f355
+      created: 1770909371790
+      modified: 1770953257242
+      isPrivate: false
+      description: ""
+      sortKey: -1770909371790
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"amount": 20000
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/12.3.0
+        description: ""
+        disabled: false
+      - name: X-User-ID
+        value: "1"
+        description: ""
+        disabled: false
+      - name: X-Idempotency-Key
+        value: test-5
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_aa06a563e8a3619ca0f3e6883a1751fed1a17565
+    created: 1770800907687
+    modified: 1770800907687
+environments:
+  name: Base Environment
+  meta:
+    id: env_aa06a563e8a3619ca0f3e6883a1751fed1a17565
+    created: 1770800907686
+    modified: 1770800972662
+    isPrivate: false
+  data:
+    BASE_PATH: localhost:8000
